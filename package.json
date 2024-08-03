@@ -14,7 +14,9 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "fiscal_code_calculator_backend": "file:",
     "jsonwebtoken": "^9.0.2",
+    "mysql": "^2.18.1",
     "ts-node": "^10.9.2"
   },
   "devDependencies": {
@@ -23,6 +25,7 @@
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.6",
+    "@types/mysql": "^2.15.26",
     "nodemon": "^3.1.4",
     "typescript": "^5.5.4"
   }
