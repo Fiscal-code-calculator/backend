@@ -73,7 +73,11 @@ fiscalcode.post("/",(req,res) => {
 	if(day <= 0 || day > 31 || month <= 0 || month > 12 || year < 1900 || year > new Date().getFullYear()){
 		return res.status(400).send({message:"In the request the day, the month or the year are invalid.",check:false});
 	}
-	const newfiscalcode:string = calculateFiscalCode(name,surname,gender,day,month,year,placeofbirth);
+	const gender1:string = gender.trim().toLowerCase();
+	if(gender1 !== "male" && gender1 !== "female"){
+		return res.status(400).send({message:"In the request the gender is invalid.",check:false});
+	}
+	const newfiscalcode:string = calculateFiscalCode(name,surname,gender1,day,month,year,placeofbirth);
 	return res.status(201).send({message:newfiscalcode,check:true});
 });
 
