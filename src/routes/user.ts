@@ -45,6 +45,28 @@ function generateToken(id:number,email:string):string{
 	return token;
 }
 
+function checkRequest(authorization:any):User|false{
+	if(!authorization){
+		return false;
+	}
+	if(typeof authorization !== "string"){
+		return false;
+	}
+	if(!authorization.includes("Bearer ")){
+		return false;
+	}
+	const details:string[] = authorization.split(" ");
+	if(details.length != 2){
+		return false;
+	}
+	const token:string = details[1];
+	const payload:User|null = checkToken(token);
+	if(payload === null){
+		return false;
+	}
+	return payload;
+}
+
 user.post("/login",async (req,res) => {
 	const {email,password} = req.body;
 	if(!email || !password){
@@ -143,25 +165,10 @@ user.post("/register",async (req,res) => {
 
 user.post("/changepassword",async (req,res) => {
 	const {authorization} = req.headers;
-	if(!authorization){
-		return res.status(403).send({message:"User not authorized to execute request.",check:false});
+	const user:User|false = checkRequest(authorization);
+	if(user === false){
+		return res.status(403).send({message:"The token or the request are invalid to continue.",check:false});
 	}
-	if(typeof authorization !== "string"){
-		return res.status(403).send({message:"User not authorized to execute request.",check:false});
-	}
-	if(!authorization.includes("Bearer ")){
-		return res.status(403).send({message:"User not authorized to execute request.",check:false});
-	}
-	const details:string[] = authorization.split(" ");
-	if(details.length != 2){
-		return res.status(403).send({message:"User not authorized to execute request.",check:false});
-	}
-	const token:string = details[1];
-	const payload:User|null = checkToken(token);
-	if(payload === null){
-		return res.status(403).send({message:"User not authorized to execute request.",check:false});
-	}
-	const user:User = <User>payload;
 	const {newpassword} = req.body;
 	if(!newpassword){
 		return res.status(406).send({message:"In the request missing required fields.",check:false});
@@ -192,4 +199,4 @@ user.post("/changepassword",async (req,res) => {
 	});
 });
 
-export {checkToken,user};
+export {checkRequest,user};
