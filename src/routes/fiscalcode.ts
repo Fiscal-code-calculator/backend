@@ -9,7 +9,7 @@ const fiscalcode:Router = Router();
 function calculateFiscalCode(name:string,surname:string,gender:string,day:number,month:number,year:number,placeofbirth:string):string{
 
 
-	//implementare in questa funzione il calcolo del codice fiscale e l'inserimento nel database
+	//implementare in questa funzione il calcolo del codice fiscale
 	return "AAABBB11A22C123P";
 
 
@@ -35,7 +35,7 @@ fiscalcode.get("/",async (req,res) => {
 			connection.end();
 			return res.status(500).send({message:"Error while executing the query.",check:false});
 		}
-		if(results.length !== 0){
+		if(results.length === 0){
 			connection.end();
 			return res.status(200).send({message:[],check:true});
 		}
@@ -44,7 +44,7 @@ fiscalcode.get("/",async (req,res) => {
 	});
 });
 
-fiscalcode.post("/",(req,res) => {
+fiscalcode.post("/",async (req,res) => {
 	const {authorization} = req.headers;
 	const user:User|false = checkRequest(authorization);
 	if(user === false){
@@ -78,7 +78,23 @@ fiscalcode.post("/",(req,res) => {
 		return res.status(400).send({message:"In the request the gender is invalid.",check:false});
 	}
 	const newfiscalcode:string = calculateFiscalCode(name,surname,gender1,day,month,year,placeofbirth);
-	return res.status(201).send({message:newfiscalcode,check:true});
+	const connection:Connection|false = await connectDatabase();
+	if(connection === false){
+		return res.status(500).send({message:"Error connection to the database.",check:false});
+	}
+	connection.query("INSERT INTO fiscal_codes (name,surname,date_of_birth,place_of_birth,gender,fiscal_code_calculated,user) VALUES ('"+name+"','"+surname+"','"+year+"-"+month+"-"+day+"','"+placeofbirth+"','"+gender1+"','"+newfiscalcode+"','"+user.userId+"')",(error:MysqlError,results:any,fields:FieldInfo[]) => {
+		if(error){
+			console.error(error);
+			connection.end();
+			return res.status(500).send({message:"Error while executing the query.",check:false});
+		}
+		if(!results){
+			connection.end();
+			return res.status(500).send({message:"Error while executing the query.",check:false});
+		}
+		connection.end();
+		res.status(201).send({message:newfiscalcode,check:true});
+	});
 });
 
 export {fiscalcode}

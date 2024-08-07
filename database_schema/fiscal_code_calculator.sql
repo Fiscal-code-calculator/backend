@@ -33,7 +33,7 @@ CREATE TABLE `fiscal_codes` (
   `surname` varchar(50) NOT NULL,
   `date_of_birth` date NOT NULL,
   `place_of_birth` varchar(50) NOT NULL,
-  `gender` tinyint(1) NOT NULL,
+  `gender` varchar(10) NOT NULL,
   `fiscal_code_calculated` varchar(50) NOT NULL,
   `user` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
