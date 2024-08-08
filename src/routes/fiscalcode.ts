@@ -2,7 +2,7 @@ import {Router} from "express";
 import {Connection,FieldInfo,MysqlError} from "mysql";
 import {checkRequest} from "./user";
 import {connectDatabase} from "../mysql_manager/connection";
-import {User} from "../interfaces/user.interface";
+import {Token} from "../interfaces/token.interface";
 
 const fiscalcode:Router = Router();
 
@@ -17,7 +17,7 @@ function calculateFiscalCode(name:string,surname:string,gender:string,day:number
 
 fiscalcode.get("/",async (req,res) => {
 	const {authorization} = req.headers;
-	const user:User|false = checkRequest(authorization);
+	const user:Token|false = checkRequest(authorization);
 	if(user === false){
 		return res.status(403).send({message:"The token or the request are invalid to continue.",check:false});
 	}
@@ -46,7 +46,7 @@ fiscalcode.get("/",async (req,res) => {
 
 fiscalcode.post("/",async (req,res) => {
 	const {authorization} = req.headers;
-	const user:User|false = checkRequest(authorization);
+	const user:Token|false = checkRequest(authorization);
 	if(user === false){
 		return res.status(403).send({message:"The token or the request are invalid to continue.",check:false});
 	}
