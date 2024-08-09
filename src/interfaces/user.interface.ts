@@ -2,5 +2,5 @@ export interface User{
 	userId:number,
 	name:string,
 	surname:string,
-	email:string,
+	email:string
 }
