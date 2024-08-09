@@ -1,17 +1,8 @@
-import express from "express";
-import cors from "cors";
-import {user} from "./routes/user";
-import {fiscalcode} from "./routes/fiscalcode";
+import {FiscalCodeApplication} from "./app";
 
-const port:number = 50000;
-const server = express();
-server.use(cors());
-server.use(express.json());
-server.use("/users",user)
-server.use("/fiscalcodes",fiscalcode)
+const PORT:number = 50000;
+const server:FiscalCodeApplication = new FiscalCodeApplication();
 
-server.get("/",(req,res) => res.send("Hello world!"));
-
-server.listen(port,() => {
-		console.log("Server is listening the port 50000.");
+server.application.listen(PORT,() => {
+		console.log(`Server is listening on the port ${PORT}.`);
 });

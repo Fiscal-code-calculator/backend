@@ -1,7 +1,7 @@
 import mysql,{Connection,MysqlError} from "mysql";
 import dotenv from "dotenv";
 
-function connectDatabase():Promise<Connection|false>{
+function connectDatabase():Promise<Connection>{
 	dotenv.config();
 	return new Promise((resolve,reject) => {
 		const connection:Connection = mysql.createConnection({
@@ -13,10 +13,8 @@ function connectDatabase():Promise<Connection|false>{
 
 		connection.connect(function(error:MysqlError){
 			if(error){
-				console.error(error);
-				resolve(false);
+				reject(error);
 			}else{
-				console.log("Connected to database.");
 				resolve(connection);
 			}
 		});
