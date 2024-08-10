@@ -27,7 +27,7 @@ export class FiscalCodeRouter{
 		const {authorization} = req.headers;
 		const token:Token|false = checkRequest(authorization);
 		if(token === false){
-			return res.status(403).send({message:"The token or the request are invalid to continue.",check:false});
+			return res.status(403).send({message:"The token or the request are invalid.",check:false});
 		}
 		const query:string = "SELECT * FROM fiscal_codes WHERE user=?";
 		executeQuery<FiscalCode>(query,[""+token.userId])
@@ -46,7 +46,7 @@ export class FiscalCodeRouter{
 		const {authorization} = req.headers;
 		const token:Token|false = checkRequest(authorization);
 		if(token === false){
-			return res.status(403).send({message:"The token or the request are invalid to continue.",check:false});
+			return res.status(403).send({message:"The token or the request are invalid.",check:false});
 		}
 		const {name,surname,gender,dateofbirth,placeofbirth} = req.body;
 		if(!name || !surname || !gender || !dateofbirth || !placeofbirth){

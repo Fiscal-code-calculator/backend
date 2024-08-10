@@ -113,7 +113,7 @@ export class UserRouter{
 		const {authorization} = req.headers;
 		const token:Token|false = checkRequest(authorization);
 		if(token === false){
-			return res.status(403).send({message:"The token or the request are invalid to continue.",check:false});
+			return res.status(403).send({message:"The token or the request are invalid.",check:false});
 		}
 		const query:string = "SELECT * FROM users WHERE user_id=?";
 		executeQuery<User>(query,[""+token.userId])
@@ -146,7 +146,7 @@ export class UserRouter{
 		const {authorization} = req.headers;
 		const token:Token|false = checkRequest(authorization);
 		if(token === false){
-			return res.status(403).send({message:"The token or the request are invalid to continue.",check:false});
+			return res.status(403).send({message:"The token or the request are invalid.",check:false});
 		}
 		const query1:string = "DELETE FROM fiscal_codes WHERE user=?";
 		executeQuery<FiscalCode>(query1,[""+token.userId])
@@ -175,7 +175,7 @@ export class UserRouter{
 		const {authorization} = req.headers;
 		const token:Token|false = checkRequest(authorization);
 		if(token === false){
-			return res.status(403).send({message:"The token or the request are invalid to continue.",check:false});
+			return res.status(403).send({message:"The token or the request are invalid.",check:false});
 		}
 		const {newpassword,repeatpassword} = req.body;
 		if(!newpassword || !repeatpassword){

@@ -40,7 +40,7 @@ function generateToken(id:number,email:string):string{
 	return token;
 }
 
-function checkRequest(authorization:any):Token|false{
+function checkRequest(authorization:string|undefined):Token|false{
 	if(!authorization){
 		return false;
 	}
