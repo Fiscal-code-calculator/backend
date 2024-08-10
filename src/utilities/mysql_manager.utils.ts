@@ -1,4 +1,4 @@
-import mysql,{Connection,MysqlError} from "mysql";
+import mysql,{Connection,FieldInfo,MysqlError,OkPacket} from "mysql";
 import dotenv from "dotenv";
 
 function connectDatabase():Promise<Connection>{
@@ -21,4 +21,34 @@ function connectDatabase():Promise<Connection>{
 	});
 }
 
-export {connectDatabase}
+function executeQuery<T>(query:string,params:string[]):Promise<T[]|OkPacket|null>{
+	return new Promise((resolve,reject) => {
+		if(!query || !params){
+			resolve(null);
+			return;
+		}
+		if(query === "" || params.length === 0){
+			resolve(null);
+			return;
+		}
+		connectDatabase()
+		.then(connection => {
+			connection.query(query,params,(error:MysqlError|null,results?:T[]|OkPacket,fields?:FieldInfo[]) => {
+				if(error){
+					connection.end();
+					reject(error);
+				}else{
+					if(!results){
+						connection.end();
+						resolve(null);
+					}else{
+						connection.end();
+						resolve(results);
+					}
+				}
+			});
+		}).catch(reject);
+	});
+}
+
+export {executeQuery};

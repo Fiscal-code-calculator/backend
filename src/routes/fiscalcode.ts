@@ -1,9 +1,10 @@
 import {Request,Response,Router} from "express";
-import {FieldInfo,MysqlError} from "mysql";
+import {MysqlError} from "mysql";
 import {calculateFiscalCode} from "../utilities/calculator_fiscal_code.utils";
 import {checkRequest} from "../utilities/token_users.utils";
-import {connectDatabase} from "../utilities/mysql_manager.utils";
+import {executeQuery} from "../utilities/mysql_manager.utils";
 import {Token} from "../interfaces/token.interface";
+import {FiscalCode} from "../interfaces/fiscalcode.interface";
 
 export class FiscalCodeRouter{
 	private _router:Router;
@@ -24,39 +25,27 @@ export class FiscalCodeRouter{
 
 	private getAll(req:Request,res:Response):Response|undefined{
 		const {authorization} = req.headers;
-		const user:Token|false = checkRequest(authorization);
-		if(user === false){
+		const token:Token|false = checkRequest(authorization);
+		if(token === false){
 			return res.status(403).send({message:"The token or the request are invalid to continue.",check:false});
 		}
-		connectDatabase()
-		.then(connection => {
-			connection.query("SELECT * FROM fiscal_codes WHERE user='" + user.userId + "'",async (error:MysqlError,results:any,fields:FieldInfo[]) => {
-				if(error){
-					console.error(error);
-					connection.end();
-					return res.status(500).send({message:"Error while executing the query.",check:false});
-				}
-				if(!results){
-					connection.end();
-					return res.status(500).send({message:"Error while executing the query.",check:false});
-				}
-				if(results.length === 0){
-					connection.end();
-					return res.status(200).send({message:[],check:true});
-				}
-				connection.end();
-				res.status(200).send({message:results,check:true});
-			});
+		const query:string = "SELECT * FROM fiscal_codes WHERE user=?";
+		executeQuery<FiscalCode>(query,[""+token.userId])
+		.then(result => {
+			if(!result || result === null){
+				return res.status(500).send({message:"Internal server error.",check:false});
+			}
+			res.status(200).send({message:result,check:true});
 		}).catch((error:MysqlError) => {
 			console.error(error);
-			return res.sendStatus(500);
+			return res.status(500).send({message:"Internal server error.",check:false});
 		});
 	}
 
 	private createElement(req:Request,res:Response):Response|undefined{
 		const {authorization} = req.headers;
-		const user:Token|false = checkRequest(authorization);
-		if(user === false){
+		const token:Token|false = checkRequest(authorization);
+		if(token === false){
 			return res.status(403).send({message:"The token or the request are invalid to continue.",check:false});
 		}
 		const {name,surname,gender,dateofbirth,placeofbirth} = req.body;
@@ -79,32 +68,33 @@ export class FiscalCodeRouter{
 		if(typeof day !== "number" || typeof month !== "number" || typeof year !== "number"){
 			return res.status(400).send({message:"In the request the day, the month or the year are invalid.",check:false});
 		}
-		if(day <= 0 || day > 31 || month <= 0 || month > 12 || year < 1900 || year > new Date().getFullYear()){
+		const actualYear:number = new Date().getFullYear();
+		const initialYear:number = actualYear - 250;
+		if(day <= 0 || day > 31 || month <= 0 || month > 12 || year < initialYear || year > actualYear){
 			return res.status(400).send({message:"In the request the day, the month or the year are invalid.",check:false});
+		}
+		if(month === 2 && day > 29){
+			return res.status(400).send({message:"The month of february has maximum 29 days.",check:false});
+		}
+		const month30Days:boolean = month === 4 || month === 6 || month === 9 || month === 11;
+		if(month30Days === true && day > 30){
+			return res.status(400).send({message:"The month selected has maximum 30 days.",check:false});
 		}
 		const gender1:string = gender.trim().toLowerCase();
 		if(gender1 !== "male" && gender1 !== "female"){
 			return res.status(400).send({message:"In the request the gender is invalid.",check:false});
 		}
 		const newfiscalcode:string = calculateFiscalCode(name,surname,gender1,day,month,year,placeofbirth);
-		connectDatabase()
-		.then(connection => {
-			connection.query("INSERT INTO fiscal_codes (name,surname,date_of_birth,place_of_birth,gender,fiscal_code_calculated,user) VALUES ('"+name+"','"+surname+"','"+year+"-"+month+"-"+day+"','"+placeofbirth+"','"+gender1+"','"+newfiscalcode+"','"+user.userId+"')",(error:MysqlError,results:any,fields:FieldInfo[]) => {
-				if(error){
-					console.error(error);
-					connection.end();
-					return res.status(500).send({message:"Error while executing the query.",check:false});
-				}
-				if(!results){
-					connection.end();
-					return res.status(500).send({message:"Error while executing the query.",check:false});
-				}
-				connection.end();
-				res.status(201).send({message:newfiscalcode,check:true});
-			});
+		const query:string = "INSERT INTO fiscal_codes (name,surname,date_of_birth,place_of_birth,gender,fiscal_code_calculated,user) VALUES (?,?,?,?,?,?,?)";
+		executeQuery<FiscalCode>(query,[name,surname,year+"-"+month+"-"+day,placeofbirth,gender1,newfiscalcode,""+token.userId])
+		.then(result => {
+			if(!result || result === null){
+				return res.status(500).send({message:"Internal server error.",check:false});
+			}
+			res.status(201).send({message:newfiscalcode,check:true});
 		}).catch((error:MysqlError) => {
 			console.error(error);
-			return res.sendStatus(500);
+			return res.status(500).send({message:"Internal server error.",check:false});
 		});
 	}
 }
