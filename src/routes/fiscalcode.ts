@@ -52,16 +52,16 @@ export class FiscalCodeRouter{
 		if(!name || !surname || !gender || !dateofbirth || !placeofbirth){
 			return res.status(406).send({message:"In the request missing required fields.",check:false});
 		}
-		if(typeof name !== "string" || typeof surname !== "string" || typeof gender !== "string" || typeof placeofbirth !== "string"){
+		if(typeof name !== "string" || typeof surname !== "string" || typeof gender !== "string" || typeof dateofbirth !== "string" || typeof placeofbirth !== "string"){
 			return res.status(400).send({message:"In the request some fields are invalid.",check:false});
 		}
-		if(name === "" || surname === "" || gender === "" || placeofbirth === ""){
+		if(name === "" || surname === "" || gender === "" || dateofbirth === "" || placeofbirth === ""){
 			return res.status(400).send({message:"In the request some fields are an empty string.",check:false});
 		}
-		if(typeof dateofbirth !== "object"){
-			res.status(400).send({message:"In the request the date of birth is invalid.",check:false});
-		}
-		const {day,month,year} = dateofbirth;
+		const date:Date = new Date(dateofbirth);
+		const day:number = date.getDate();
+		const month:number = date.getMonth();
+		const year:number = date.getFullYear();
 		if(!day || !month || !year){
 			return res.status(406).send({message:"In the request missing required fields.",check:false});
 		}

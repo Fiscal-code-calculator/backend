@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Ago 03, 2024 alle 18:44
+-- Creato il: Ago 12, 2024 alle 20:11
 -- Versione del server: 10.4.27-MariaDB
 -- Versione PHP: 8.1.12
 
@@ -48,6 +48,10 @@ CREATE TABLE `users` (
   `user_id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
   `surname` varchar(50) NOT NULL,
+  `date_of_birth` date DEFAULT NULL,
+  `place_of_birth` varchar(50) DEFAULT NULL,
+  `gender` varchar(10) DEFAULT NULL,
+  `address` varchar(200) DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

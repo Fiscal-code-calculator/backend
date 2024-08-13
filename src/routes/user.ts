@@ -21,8 +21,11 @@ export class UserRouter{
 
 	private loadRoutes():void{
 		this._router.post("/login",this.doLogin);
+		this._router.post("/sendemail",this.sendEmailRestorePassword);
+		this._router.post("/restorepassword",this.restorePassword);
 		this._router.post("/register",this.createProfile);
 		this._router.get("/",this.getProfile);
+		this._router.put("/",this.updateProfile);
 		this._router.delete("/",this.deleteProfile);
 		this._router.post("/changepassword",this.changePassword)
 	}
@@ -61,6 +64,88 @@ export class UserRouter{
 					}
 				}
 			}
+		}).catch((error:MysqlError) => {
+			console.error(error);
+			return res.status(500).send({message:"Internal server error.",check:false});
+		});
+	}
+
+	private sendEmailRestorePassword(req:Request,res:Response):Response|undefined{
+		const {email} = req.body;
+		if(!email){
+			return res.status(406).send({message:"In the request missing required fields.",check:false});
+		}
+		if(typeof email !== "string"){
+			return res.status(400).send({message:"In the request the email is invalid.",check:false});
+		}
+		if(email === ""){
+			return res.status(400).send({message:"In the request the email is an empty string.",check:false});
+		}
+		const query:string = "SELECT * FROM users WHERE email=?";
+		executeQuery<User>(query,[email])
+		.then(result => {
+			if(!result || result === null){
+				return res.status(500).send({message:"Internal server error.",check:false});
+			}
+			const users:User[] = <User[]>result;
+			if(users.length === 0){
+				return res.status(404).send({message:"User not found.",check:false});
+			}
+			const user:User = users[0];
+			const token:string = generateToken(user.user_id,user.email);
+
+
+			//inserire qui l'invio dell'email contenente il token
+			console.log(token);
+			return res.sendStatus(501);
+
+
+		}).catch((error:MysqlError) => {
+			console.error(error);
+			return res.status(500).send({message:"Internal server error.",check:false});
+		});
+	}
+
+	private restorePassword(req:Request,res:Response):Response|undefined{
+		const {authorization,newpassword,repeatpassword} = req.body;
+		if(!authorization || !newpassword || !repeatpassword){
+			return res.status(406).send({message:"In the request missing required fields.",check:false});
+		}
+		if(typeof authorization !== "string" || typeof newpassword !== "string" || typeof repeatpassword !== "string"){
+			return res.status(400).send({message:"In the request the token, the password or its repetition are invalid.",check:false});
+		}
+		if(authorization === "" || newpassword === "" || repeatpassword === ""){
+			return res.status(400).send({message:"In the request the token, the password or its repetition are empty string.",check:false});
+		}
+		if(newpassword !== repeatpassword){
+			return res.status(400).send({message:"In the request the password or its repetition must have the same value.",check:false});
+		}
+		const token:Token|false = checkRequest("Bearer " + authorization);
+		if(token === false){
+			return res.status(403).send({message:"The token or the request are invalid.",check:false});
+		}
+		const query1:string = "SELECT * FROM users WHERE email=?";
+		executeQuery<User>(query1,[token.email])
+		.then(result1 => {
+			if(!result1 || result1 === null){
+				return res.status(500).send({message:"Internal server error.",check:false});
+			}
+			const users:User[] = <User[]>result1;
+			if(users.length === 0){
+				return res.status(404).send({message:"User not found.",check:false});
+			}
+			const newPasswordHashed:string = bcrypt.hashSync(newpassword,10);
+			const query2:string = "UPDATE users SET password=? WHERE user_id=?";
+			executeQuery<User>(query2,[newPasswordHashed,""+users[0].user_id])
+			.then(result2 => {
+				if(!result2 || result2 === null){
+					return res.send(500).send({message:"Internal server error.",check:false});
+				}
+				return res.send(200).send({message:"Password changed correctly.",check:true});
+			}).catch((error:MysqlError) => {
+				console.error(error);
+				return res.send(500).send({message:"Internal server error.",check:false});
+			});
 		}).catch((error:MysqlError) => {
 			console.error(error);
 			return res.status(500).send({message:"Internal server error.",check:false});
@@ -131,11 +216,50 @@ export class UserRouter{
 						user_id:users[i].user_id,
 						name:users[i].name,
 						surname:users[i].surname,
+						date_of_birth:users[i].date_of_birth,
+						place_of_birth:users[i].place_of_birth,
+						gender:users[i].gender,
+						address:users[i].address,
 						email:users[i].email
 					}
 					return res.status(200).send({message:output,check:true})
 				}
 			}
+		}).catch((error:MysqlError) => {
+			console.error(error);
+			return res.status(500).send({message:"Internal server error.",check:false});
+		});
+	}
+
+	private updateProfile(req:Request,res:Response):Response|undefined{
+		const {authorization} = req.headers;
+		const token:Token|false = checkRequest(authorization);
+		if(token === false){
+			return res.status(403).send({message:"The token or the request are invalid.",check:false});
+		}
+
+
+		//inserire qui il prelevamento dei dati (req.body) ed i vari controlli
+
+
+		const query:string = "SELECT * FROM users WHERE email=?";
+		executeQuery<User>(query,[token.email])
+		.then(result => {
+			if(!result || result === null){
+				return res.status(500).send({message:"Internal server error.",check:false});
+			}
+			const users:User[] = <User[]>result;
+			if(users.length === 0){
+				return res.status(404).send({message:"User not found.",check:false});
+			}
+			const user:User = users[0];
+
+
+			//inserire qui la logica di aggiornamento dell'utente in base al design del frontend
+			console.log(user);
+			return res.sendStatus(501);
+
+
 		}).catch((error:MysqlError) => {
 			console.error(error);
 			return res.status(500).send({message:"Internal server error.",check:false});
