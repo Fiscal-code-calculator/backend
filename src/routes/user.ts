@@ -237,14 +237,14 @@ export class UserRouter{
 		if(token === false){
 			return res.status(403).send({message:"The token or the request are invalid.",check:false});
 		}
-		const {dateOfBirth,placeOfBirth,gender,address,email} = req.body;
-		if(!dateOfBirth || !placeOfBirth || !gender || !address || !email){
+		const {dateofbirth,placeofbirth,gender,address,email} = req.body;
+		if(!dateofbirth || !placeofbirth || !gender || !address || !email){
 			return res.status(406).send({message:"In the request missing required fields.",check:false});
 		}
-		if(typeof dateOfBirth !== "string" || typeof placeOfBirth !== "string" || typeof gender !== "string" || typeof address !== "string" || typeof email !== "string"){
+		if(typeof dateofbirth !== "string" || typeof placeofbirth !== "string" || typeof gender !== "string" || typeof address !== "string" || typeof email !== "string"){
 			return res.status(400).send({message:"In the request some fields are invalid.",check:false});
 		}
-		if(dateOfBirth === "" || placeOfBirth === "" || gender === "" || address === "" || email === ""){
+		if(dateofbirth === "" || placeofbirth === "" || gender === "" || address === "" || email === ""){
 			return res.status(400).send({message:"In the request some fields are empty string.",check:false});
 		}
 		const gender1:string = gender.trim().toLowerCase();
@@ -262,7 +262,7 @@ export class UserRouter{
 				return res.status(404).send({message:"User not found.",check:false});
 			}
 			const query2:string = "UPDATE users SET date_of_birth=?,place_of_birth=?,gender=?,address=?,email=? WHERE user_id=?";
-			executeQuery<User>(query2,[dateOfBirth,placeOfBirth,gender1,address,email,""+token.userId])
+			executeQuery<User>(query2,[dateofbirth,placeofbirth,gender1,address,email,""+token.userId])
 			.then(result2 => {
 				if(!result2 || result2 === null){
 					return res.status(500).send({message:"Internal server error.",check:false});
