@@ -237,29 +237,41 @@ export class UserRouter{
 		if(token === false){
 			return res.status(403).send({message:"The token or the request are invalid.",check:false});
 		}
-
-
-		//inserire qui il prelevamento dei dati (req.body) ed i vari controlli
-
-
-		const query:string = "SELECT * FROM users WHERE email=?";
-		executeQuery<User>(query,[token.email])
-		.then(result => {
-			if(!result || result === null){
+		const {dateOfBirth,placeOfBirth,gender,address,email} = req.body;
+		if(!dateOfBirth || !placeOfBirth || !gender || !address || !email){
+			return res.status(406).send({message:"In the request missing required fields.",check:false});
+		}
+		if(typeof dateOfBirth !== "string" || typeof placeOfBirth !== "string" || typeof gender !== "string" || typeof address !== "string" || typeof email !== "string"){
+			return res.status(400).send({message:"In the request some fields are invalid.",check:false});
+		}
+		if(dateOfBirth === "" || placeOfBirth === "" || gender === "" || address === "" || email === ""){
+			return res.status(400).send({message:"In the request some fields are empty string.",check:false});
+		}
+		const gender1:string = gender.trim().toLowerCase();
+		if(gender1 !== "male" && gender1 !== "female"){
+			return res.status(400).send({message:"In the request the gender is invalid.",check:false});
+		}
+		const query1:string = "SELECT * FROM users WHERE email=?";
+		executeQuery<User>(query1,[token.email])
+		.then(result1 => {
+			if(!result1 || result1 === null){
 				return res.status(500).send({message:"Internal server error.",check:false});
 			}
-			const users:User[] = <User[]>result;
+			const users:User[] = <User[]>result1;
 			if(users.length === 0){
 				return res.status(404).send({message:"User not found.",check:false});
 			}
-			const user:User = users[0];
-
-
-			//inserire qui la logica di aggiornamento dell'utente in base al design del frontend
-			console.log(user);
-			return res.sendStatus(501);
-
-
+			const query2:string = "UPDATE users SET date_of_birth=?,place_of_birth=?,gender=?,address=?,email=? WHERE user_id=?";
+			executeQuery<User>(query2,[dateOfBirth,placeOfBirth,gender1,address,email,""+token.userId])
+			.then(result2 => {
+				if(!result2 || result2 === null){
+					return res.status(500).send({message:"Internal server error.",check:false});
+				}
+				return res.status(200).send({message:"Personal profile updated correctly.",check:true});
+			}).catch((error:MysqlError) => {
+				console.error(error);
+				return res.status(500).send({message:"Internal server error.",check:false});
+			});
 		}).catch((error:MysqlError) => {
 			console.error(error);
 			return res.status(500).send({message:"Internal server error.",check:false});
