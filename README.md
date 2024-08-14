@@ -2,4 +2,4 @@
 
 ## Description
 
-Server of the simple application to calculate the fiscal code following italian rules.
+The @Fiscal-code-calculator app's server, designed to accurately compute the fiscal code in accordance to Italy's estabilished national guidelines.

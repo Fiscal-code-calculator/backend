@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Ago 12, 2024 alle 20:11
--- Versione del server: 10.4.27-MariaDB
--- Versione PHP: 8.1.12
+-- Creation: Aug 12, 2024 at 08:11 PM
+-- Server version: 10.4.27-MariaDB
+-- PHP Version: 8.1.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `fiscal_codes`
+-- `fiscal_codes` table0s structure
 --
 
 CREATE TABLE `fiscal_codes` (
@@ -41,7 +41,7 @@ CREATE TABLE `fiscal_codes` (
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `users`
+-- `users` table's structure
 --
 
 CREATE TABLE `users` (
@@ -57,44 +57,44 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Indici per le tabelle scaricate
+-- Downloaded tables' indexes 
 --
 
 --
--- Indici per le tabelle `fiscal_codes`
+-- Indexes for `fiscal_codes` tables
 --
 ALTER TABLE `fiscal_codes`
   ADD PRIMARY KEY (`fiscal_code_id`),
   ADD KEY `foreign_key_user` (`user`);
 
 --
--- Indici per le tabelle `users`
+-- Indexes for `users` tables
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`);
 
 --
--- AUTO_INCREMENT per le tabelle scaricate
+-- AUTO_INCREMENT for the downloaded tables
 --
 
 --
--- AUTO_INCREMENT per la tabella `fiscal_codes`
+-- AUTO_INCREMENT for the `fiscal_codes` table
 --
 ALTER TABLE `fiscal_codes`
   MODIFY `fiscal_code_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT per la tabella `users`
+-- AUTO_INCREMENT for the `users` table
 --
 ALTER TABLE `users`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- Limiti per le tabelle scaricate
+-- Limits for the downloaded tables
 --
 
 --
--- Limiti per la tabella `fiscal_codes`
+-- Limits for the table `fiscal_codes`
 --
 ALTER TABLE `fiscal_codes`
   ADD CONSTRAINT `foreign_key_user` FOREIGN KEY (`user`) REFERENCES `users` (`user_id`);

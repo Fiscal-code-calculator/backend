@@ -95,7 +95,7 @@ export class UserRouter{
 			const token:string = generateToken(user.user_id,user.email);
 
 
-			//inserire qui l'invio dell'email contenente il token
+			// TODO: add here email sending
 			console.log(token);
 			return res.sendStatus(501);
 
