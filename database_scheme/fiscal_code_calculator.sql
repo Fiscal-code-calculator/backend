@@ -27,6 +27,9 @@ SET time_zone = "+00:00";
 -- `fiscal_codes` table0s structure
 --
 
+CREATE DATABASE fiscal_code_calculator;
+USE fiscal_code_calculator;
+
 CREATE TABLE `fiscal_codes` (
   `fiscal_code_id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
