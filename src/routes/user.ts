@@ -106,7 +106,7 @@ export class UserRouter{
 		});
 	}
 
-	private restorePassword(req:Request,res:Response):Response|undefined{
+	private async restorePassword(req:Request,res:Response):Promise<Response|undefined>{
 		const {authorization,newpassword,repeatpassword} = req.body;
 		if(!authorization || !newpassword || !repeatpassword){
 			return res.status(406).send({message:"In the request missing required fields.",check:false});
@@ -120,7 +120,7 @@ export class UserRouter{
 		if(newpassword !== repeatpassword){
 			return res.status(400).send({message:"In the request the password or its repetition must have the same value.",check:false});
 		}
-		const token:Token|false = checkRequest("Bearer " + authorization);
+		const token:Token|false = await checkRequest("Bearer " + authorization);
 		if(token === false){
 			return res.status(403).send({message:"The token or the request are invalid.",check:false});
 		}
@@ -194,9 +194,9 @@ export class UserRouter{
 		});
 	}
 
-	private getProfile(req:Request,res:Response):Response|undefined{
+	private async getProfile(req:Request,res:Response):Promise<Response|undefined>{
 		const {authorization} = req.headers;
-		const token:Token|false = checkRequest(authorization);
+		const token:Token|false = await checkRequest(authorization);
 		if(token === false){
 			return res.status(403).send({message:"The token or the request are invalid.",check:false});
 		}
@@ -231,9 +231,9 @@ export class UserRouter{
 		});
 	}
 
-	private updateProfile(req:Request,res:Response):Response|undefined{
+	private async updateProfile(req:Request,res:Response):Promise<Response|undefined>{
 		const {authorization} = req.headers;
-		const token:Token|false = checkRequest(authorization);
+		const token:Token|false = await checkRequest(authorization);
 		if(token === false){
 			return res.status(403).send({message:"The token or the request are invalid.",check:false});
 		}
@@ -278,9 +278,9 @@ export class UserRouter{
 		});
 	}
 
-	private deleteProfile(req:Request,res:Response):Response|undefined{
+	private async deleteProfile(req:Request,res:Response):Promise<Response|undefined>{
 		const {authorization} = req.headers;
-		const token:Token|false = checkRequest(authorization);
+		const token:Token|false = await checkRequest(authorization);
 		if(token === false){
 			return res.status(403).send({message:"The token or the request are invalid.",check:false});
 		}
@@ -309,7 +309,7 @@ export class UserRouter{
 
 	private async changePassword(req:Request,res:Response):Promise<Response|undefined>{
 		const {authorization} = req.headers;
-		const token:Token|false = checkRequest(authorization);
+		const token:Token|false = await checkRequest(authorization);
 		if(token === false){
 			return res.status(403).send({message:"The token or the request are invalid.",check:false});
 		}

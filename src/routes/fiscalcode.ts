@@ -23,9 +23,9 @@ export class FiscalCodeRouter{
 		this._router.post("/",this.createElement);
 	}
 
-	private getAll(req:Request,res:Response):Response|undefined{
+	private async getAll(req:Request,res:Response):Promise<Response|undefined>{
 		const {authorization} = req.headers;
-		const token:Token|false = checkRequest(authorization);
+		const token:Token|false = await checkRequest(authorization);
 		if(token === false){
 			return res.status(403).send({message:"The token or the request are invalid.",check:false});
 		}
@@ -42,9 +42,9 @@ export class FiscalCodeRouter{
 		});
 	}
 
-	private createElement(req:Request,res:Response):Response|undefined{
+	private async createElement(req:Request,res:Response):Promise<Response|undefined>{
 		const {authorization} = req.headers;
-		const token:Token|false = checkRequest(authorization);
+		const token:Token|false = await checkRequest(authorization);
 		if(token === false){
 			return res.status(403).send({message:"The token or the request are invalid.",check:false});
 		}
